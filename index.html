@@ -39,6 +39,10 @@
       <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Mentees</h2>
       <div id="students-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Email Notifications</h2>
+        <div id="emails-list" class="space-y-4"></div>
+    </div>    
   </main>
 </div>
 
@@ -79,10 +83,11 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
-  getFirestore, collection, getDocs, setDoc, doc, addDoc, updateDoc, deleteDoc, query, where, onSnapshot
+  getFirestore, collection, getDocs, setDoc, doc, addDoc, updateDoc, deleteDoc, query, where, onSnapshot, orderBy, limit
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
+const emailsContainer = document.getElementById("emails-list");
 const firebaseConfig = {
   apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
   authDomain: "codeed-3416c.firebaseapp.com",
@@ -163,6 +168,28 @@ async function deleteMentee(id) {
   await deleteDoc(doc(db,"learners",id));
 }
 
+async function loadEmails() {
+    const emailsRef = collection(db, "emails");
+    const q = query(emailsRef, orderBy("createdAt", 'desc'), limit(20)); // show latest 20 emails
+    const snapshot = await getDocs(q);
+
+    emailsContainer.innerHTML = ""; // clear previous
+    snapshot.forEach(doc => {
+        const email = doc.data();
+        const div = document.createElement("div");
+        div.className = "p-4 bg-white rounded shadow flex justify-between items-center";
+        div.innerHTML = `
+            <div>
+                <p class="text-gray-800 font-medium">${email.subject}</p>
+                <p class="text-gray-600 text-sm">To: ${email.to}</p>
+                <p class="text-gray-500 text-xs">Status: ${email.status}</p>
+            </div>
+            <span class="text-gray-400 text-sm">${new Date(email.createdAt.seconds * 1000).toLocaleString()}</span>
+        `;
+        emailsContainer.appendChild(div);
+    });
+}
+
 // ---------- Render ----------
 function escapeHtml(text){ return String(text).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
@@ -218,7 +245,6 @@ function renderSnapshot(snapshot){
   }
   feather.replace();
 }
-
 // ---------- Firestore realtime listener ----------
 onSnapshot(learnersCol, renderSnapshot, err=>console.error(err));
 
@@ -243,6 +269,7 @@ form.addEventListener("submit",async e=>{
   modal.classList.add("hidden");
   form.reset();
 });
+loadEmails();
 </script>
 </body>
 </html>
