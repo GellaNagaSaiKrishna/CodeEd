@@ -50,12 +50,6 @@
         <div id="students-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </div>
     </main>
-
-    <!-- Floating Add Student Button -->
-    <button id="add-student-btn" 
-      class="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg">
-      <i data-feather="plus" class="w-6 h-6"></i>
-    </button>
   </div>
 
   <script>
@@ -65,7 +59,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
@@ -85,18 +79,13 @@
       const container = document.getElementById("students-list");
       container.innerHTML = "";
 
-      querySnapshot.forEach((docSnap) => {
-        const learner = docSnap.data();
+      querySnapshot.forEach((doc) => {
+        const learner = doc.data();
         let riskLevel = learner.dropoff_risk || "low";
 
         const card = `
           <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-            <div class="p-6 relative">
-              <!-- Delete Button -->
-              <button onclick="deleteStudent('${docSnap.id}')" 
-                class="absolute top-4 right-4 text-red-500 hover:text-red-700">
-                <i data-feather="trash-2"></i>
-              </button>
+            <div class="p-6">
               <div class="flex items-center mb-4">
                 <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
                   <i data-feather="user" class="text-blue-600 w-8 h-8"></i>
@@ -125,8 +114,7 @@
                   <div class="progress-fill risk-${riskLevel.toLowerCase()}" style="width:${riskLevel === 'high' ? '100' : (riskLevel === 'medium' ? '60' : '30')}%"></div>
                 </div>
               </div>
-              <a href="mentee-details.html?id=${docSnap.id}" 
-                class="block w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-center rounded-md">
+              <a href="mentee-details.html?id=${doc.id}" class="block w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-center rounded-md">
                 View Details
               </a>
             </div>
@@ -137,19 +125,6 @@
 
       feather.replace();
     }
-
-    // Delete student function
-    window.deleteStudent = async function(id) {
-      if (confirm("Are you sure you want to delete this student?")) {
-        await deleteDoc(doc(db, "learners", id));
-        loadStudents();
-      }
-    }
-
-    // Add student button
-    document.getElementById("add-student-btn").addEventListener("click", () => {
-      window.location.href = "add-student.html"; // redirect to add student page
-    });
 
     loadStudents();
   </script>
