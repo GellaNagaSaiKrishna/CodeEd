@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .risk-low { background-color: #10b981; }
+        .risk-medium { background-color: #f59e0b; }
+        .risk-high { background-color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-900">
+                    <i data-feather="users" class="inline mr-2"></i> Mentor Dashboard
+                </h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Welcome, Mentor</span>
+                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <i data-feather="user" class="text-indigo-600"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Mentees</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Mentees Grid -->
+                    <div id="students-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        AOS.init();
+        feather.replace();
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+      
+        const firebaseConfig = {
+          apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
+          authDomain: "codeed-3416c.firebaseapp.com",
+          projectId: "codeed-3416c",
+          storageBucket: "codeed-3416c.appspot.com",
+          messagingSenderId: "701222817406",
+          appId: "1:701222817406:web:809d58b9660342cc12122f",
+          measurementId: "G-ZY9KGPJC66"
+        };
+      
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+      
+        async function loadStudents() {
+            const querySnapshot = await getDocs(collection(db, "learners"));
+            const container = document.getElementById("students-list"); // safer than .grid
+
+            container.innerHTML = ""; // clear hardcoded mentees
+
+            querySnapshot.forEach((doc) => {
+                const learner = doc.data();
+
+                // compute risk label if needed
+                let riskLevel = learner.dropoff_risk || "low";
+                const card = `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                        <i data-feather="user" class="text-blue-600 w-8 h-8"></i>
+                        </div>
+                        <div>
+                        <h3 class="text-lg font-semibold text-gray-800">${learner.name}</h3>
+                        <p class="text-gray-600">${learner.course}</p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Course Progress</span>
+                        <span>${learner.completion_rate}%</span>
+                        </div>
+                        <div class="progress-bar">
+                        <div class="progress-fill bg-blue-500" style="width: ${learner.completion_rate}%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Dropout Risk</span>
+                        <span>(${learner.dropoff_risk})</span>
+                        </div>
+                        <div class="progress-bar">
+                        <div class="progress-fill risk-${riskLevel.toLowerCase()}" style="width:"></div>
+                        </div>
+                    </div>
+                    <a href="mentee-details.html?id=${doc.id}" class="block w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-center rounded-md">
+                        View Details
+                    </a>
+                    </div>
+                </div>
+                `;
+                container.insertAdjacentHTML("beforeend", card);
+            });
+
+            feather.replace();
+        }
+
+      
+        loadStudents();
+    </script>
+      
+</body>
+</html>
