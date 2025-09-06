@@ -1,189 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentor Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <style>
-        .progress-bar {
-            height: 8px;
-            border-radius: 4px;
-            background-color: #e5e7eb;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-        .risk-low { background-color: #10b981; }
-        .risk-medium { background-color: #f59e0b; }
-        .risk-high { background-color: #ef4444; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mentor Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+  <style>
+    .progress-bar { height: 8px; border-radius: 4px; background-color: #e5e7eb; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.35s ease; display:block; }
+    .progress-fill.completion { background-color: #3b82f6; }
+    .progress-fill.risk-low { background-color: #10b981; }
+    .progress-fill.risk-medium { background-color: #f59e0b; }
+    .progress-fill.risk-high { background-color: #ef4444; }
+    .delete-button { position:absolute; top:0.5rem; right:0.5rem; }
+  </style>
 </head>
 <body class="bg-gray-50">
-    <div class="min-h-screen">
-        <header class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
-                <h1 class="text-3xl font-bold text-gray-900">
-                    <i data-feather="users" class="inline mr-2"></i> Mentor Dashboard
-                </h1>
-                <div class="flex items-center space-x-4">
-                    <span class="text-gray-600">Welcome, Mentor</span>
-                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                        <i data-feather="user" class="text-indigo-600"></i>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <div class="mb-8">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Mentees</h2>
-                <div id="students-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            </div>
-        </main>
+<div class="min-h-screen">
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
+      <h1 class="text-3xl font-bold text-gray-900"><i data-feather="users" class="inline mr-2"></i> Mentor Dashboard</h1>
+      <div class="flex items-center space-x-4">
+        <span class="text-gray-600" id="mentorEmail">Welcome</span>
+        <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+          <i data-feather="user" class="text-indigo-600"></i>
+        </div>
+        <button id="logoutBtn" class="px-3 py-1 bg-red-500 text-white rounded">Logout</button>
+      </div>
     </div>
+  </header>
 
-    <script>
-        AOS.init();
-        feather.replace();
-    </script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        import { doc, updateDoc, addDoc, query, where } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-      
-        const firebaseConfig = {
-          apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
-          authDomain: "codeed-3416c.firebaseapp.com",
-          projectId: "codeed-3416c",
-          storageBucket: "codeed-3416c.appspot.com",
-          messagingSenderId: "701222817406",
-          appId: "1:701222817406:web:809d58b9660342cc12122f",
-          measurementId: "G-ZY9KGPJC66"
-        };
-      
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-      
-        function getRiskProgress(risk) {
-            const riskMap = {
-                'low': 33,
-                'medium': 66,
-                'high': 100
-            };
-            return riskMap[risk.toLowerCase()] || 0;
-        }
+  <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Mentees</h2>
+      <div id="students-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+  </main>
+</div>
 
-        async function saveStudentRisk(studentId, risk) {
-          const studentRef = doc(db, "learners", studentId);
-            await updateDoc(studentRef, { risk: risk });
-        }       
+<!-- Floating Add Button -->
+<button id="addMenteeBtn"
+  class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg z-40"
+  title="Add Mentee">
+  <i data-feather="plus" class="w-6 h-6"></i>
+</button>
 
-        async function createEmail(student, risk) {
-            // Check if a pending email for this student already exists
-            const emailsRef = collection(db, "emails");
-            const q = query(emailsRef, where("studentId", "==", student.id), where("status", "==", "pending"));
-            const snapshot = await getDocs(q);
+<!-- Add Mentee Modal -->
+<div id="addMenteeModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+    <h2 class="text-lg font-semibold mb-4">Add New Mentee</h2>
+    <form id="menteeForm" class="space-y-4">
+      <input type="text" id="name" placeholder="Full Name" class="w-full border px-3 py-2 rounded-lg" required />
+      <input type="email" id="email" placeholder="Email" class="w-full border px-3 py-2 rounded-lg" required />
+      <input type="text" id="course" placeholder="Course" class="w-full border px-3 py-2 rounded-lg" required />
+      <input type="number" id="completion" placeholder="Completion %" min="0" max="100" class="w-full border px-3 py-2 rounded-lg" required />
+      <select id="risk" class="w-full border px-3 py-2 rounded-lg" required>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+      <div class="flex justify-end space-x-2">
+        <button type="button" id="closeModal" class="px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-            if (!snapshot.empty) {
-                console.log(`Email already pending for ${student.name}, skipping`);
-                return;
-            }
-            const emailData = {
-                to: student.email,
-                subject: `Stay on track, ${student.name}!`,
-                body: `Hi ${student.name},\n\nWe noticed you are at ${risk.toUpperCase()} risk of dropping off your course.\n\nBest,\nMentor Dashboard Team`,
-                studentId: student.id,
-                status: "pending",
-                createdAt: new Date(),
-            };
+<script>
+  AOS.init();
+  feather.replace();
+</script>
 
-            await addDoc(collection(db, "emails"), emailData);
-        }
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, setDoc, doc, addDoc, updateDoc, deleteDoc, query, where, onSnapshot
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-        async function classifyAndEmail(student) {
-            let risk = "low";
+const firebaseConfig = {
+  apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
+  authDomain: "codeed-3416c.firebaseapp.com",
+  projectId: "codeed-3416c",
+  storageBucket: "codeed-3416c.appspot.com",
+  messagingSenderId: "701222817406",
+  appId: "1:701222817406:web:809d58b9660342cc12122f",
+  measurementId: "G-ZY9KGPJC66"
+};
 
-            // Simple heuristic
-            if (student.completion_rate < 30 && student.last_login > 7) {
-                risk = "high";
-            } else if (student.completion_rate < 60 && student.last_login > 3) {
-                risk = "medium";
-            }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const learnersCol = collection(db, "learners");
+const container = document.getElementById("students-list");
 
-            // Save risk level back to student object (so you can display it in dashboard)
-            student.dropoff_risk = risk;
-            await saveStudentRisk(student.id, risk);
+const auth = getAuth(app);
+onAuthStateChanged(auth, (user) => {
+  if (!user) window.location.href = "auth.html";
+  else document.getElementById("mentorEmail").textContent = "Welcome, " + (user.email || "Mentor");
+});
 
-            // If risk is medium or high, create email in Firestore
-            if (risk === "medium" || risk === "high") {
-                await createEmail(student, risk);
-            }
-        }
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  signOut(auth).then(() => window.location.href = "auth.html");
+});
 
-        async function loadStudents() {
-            const querySnapshot = await getDocs(collection(db, "learners"));
-            const container = document.getElementById("students-list");
-            container.innerHTML = "";
+// ---------- Risk / Email Logic ----------
+function getRiskProgress(risk) {
+  return risk === "low" ? 33 : risk === "medium" ? 66 : 100;
+}
 
-            querySnapshot.forEach((doc) => {
-                const learner = doc.data();
-                learner.id = doc.id;
-                classifyAndEmail(learner);
-                const riskLevel = learner.dropoff_risk || "low";
-                const riskProgressWidth = getRiskProgress(riskLevel);
+async function saveStudentRisk(studentId, risk) {
+  await updateDoc(doc(db, "learners", studentId), { dropoff_risk: risk });
+}
 
-                const card = `
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 w-full" data-aos="fade-up">
-                    <div class="p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
-                        <i data-feather="user" class="text-blue-600 w-8 h-8"></i>
-                        </div>
-                        <div>
-                        <h3 class="text-lg font-semibold text-gray-800">${learner.name}</h3>
-                        <p class="text-gray-600">${learner.course}</p>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <div class="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>Course Progress</span>
-                        <span>${learner.completion_rate}%</span>
-                        </div>
-                        <div class="progress-bar">
-                        <div class="progress-fill bg-blue-500" style="width: ${learner.completion_rate}%"></div>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <div class="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>Dropout Risk</span>
-                        <span>(${learner.dropoff_risk})</span>
-                        </div>
-                        <div class="progress-bar">
-                        <div class="progress-fill risk-${riskLevel.toLowerCase()}" style="width: ${riskProgressWidth}%"></div>
-                        </div>
-                    </div>
-                    <a href="mentee-details.html?id=${doc.id}" class="block w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-center rounded-md">
-                        View Details
-                    </a>
-                    </div>
-                </div>
-                `;
-                container.insertAdjacentHTML("beforeend", card);
-            });
+async function createEmail(student, risk) {
+  const emailsRef = collection(db, "emails");
+  const q = query(emailsRef, where("studentId", "==", student.id), where("status", "==", "pending"));
+  const snapshot = await getDocs(q);
+  if (!snapshot.empty) return;
+  await addDoc(emailsRef, {
+    to: student.email,
+    subject: `Stay on track, ${student.name}!`,
+    body: `Hi ${student.name},\n\nWe noticed you are at ${risk.toUpperCase()} risk of dropping off your course.\n\nBest,\nMentor Dashboard Team`,
+    studentId: student.id,
+    status: "pending",
+    createdAt: new Date()
+  });
+}
 
-            feather.replace();
-        }
+async function classifyAndEmail(student) {
+  let risk = "low";
+  if (student.completion_rate < 30 && student.last_login > 7) risk = "high";
+  else if (student.completion_rate < 60 && student.last_login > 3) risk = "medium";
+  student.dropoff_risk = risk;
+  await saveStudentRisk(student.id, risk);
+  if (risk === "medium" || risk === "high") await createEmail(student, risk);
+}
 
-        loadStudents();
-    </script>
-      
+// ---------- Add/Delete Mentee ----------
+async function getNextLearnerId() {
+  const snap = await getDocs(learnersCol);
+  const nums = snap.docs.map(d => {
+    const m = d.id.match(/^learner_(\d+)$/);
+    return m ? Number(m[1]) : null;
+  }).filter(Number.isInteger).sort((a,b)=>a-b);
+  let next = 1;
+  for (let i=0;i<nums.length;i++){if(nums[i]===next) next++; else if(nums[i]>next) break;}
+  return `learner_${next}`;
+}
+
+async function addMentee(data) {
+  const id = await getNextLearnerId();
+  await setDoc(doc(db,"learners",id), data);
+}
+
+async function deleteMentee(id) {
+  if (!confirm("Are you sure you want to delete this mentee?")) return;
+  await deleteDoc(doc(db,"learners",id));
+}
+
+// ---------- Render ----------
+function escapeHtml(text){ return String(text).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function renderSnapshot(snapshot){
+  container.innerHTML = "";
+  const items = snapshot.docs.map(d => ({ id: d.id, data: d.data() }));
+  items.sort((a,b)=>(["low","medium","high"].indexOf(a.data.dropoff_risk)-["low","medium","high"].indexOf(b.data.dropoff_risk))*-1);
+  for(const item of items){
+    const m=item.data;
+    const risk=m.dropoff_risk||"low";
+    const completion=Number(m.completion_rate||0);
+    const card=document.createElement("div");
+    card.className="bg-white rounded-lg shadow-md p-6 relative";
+    card.setAttribute("data-aos","fade-up");
+    card.innerHTML=`
+      <button class="delete-button text-red-500 hover:text-red-700" data-id="${item.id}" title="Delete mentee"><i data-feather="trash-2"></i></button>
+      <div class="flex items-center mb-4">
+        <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+          <i data-feather="user" class="text-blue-600 w-8 h-8"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">${escapeHtml(m.name||"No name")}</h3>
+          <p class="text-gray-600">${escapeHtml(m.course||"")}</p>
+          <p class="text-gray-500 text-sm">${escapeHtml(m.email||"")}</p>
+        </div>
+      </div>
+      <div class="mb-4">
+        <div class="flex justify-between text-sm text-gray-600 mb-1">
+          <span>Course Progress</span>
+          <span>${completion}%</span>
+        </div>
+        <div class="progress-bar">
+          <span class="progress-fill completion" style="width:${completion}%"></span>
+        </div>
+      </div>
+      <div class="mb-4">
+        <div class="flex justify-between text-sm text-gray-600 mb-1">
+          <span>Dropout Risk</span>
+          <span>(${escapeHtml(risk)})</span>
+        </div>
+        <div class="progress-bar">
+          <span class="progress-fill risk-${risk}" style="width:${getRiskProgress(risk)}%"></span>
+        </div>
+      </div>
+      <a href="mentee-details.html?id=${encodeURIComponent(item.id)}" class="block w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-center rounded-md">View Details</a>
+    `;
+    container.appendChild(card);
+
+    card.querySelector(".delete-button").addEventListener("click",()=>deleteMentee(item.id));
+
+    // Run risk/email logic
+    classifyAndEmail({...m,id:item.id});
+  }
+  feather.replace();
+}
+
+// ---------- Firestore realtime listener ----------
+onSnapshot(learnersCol, renderSnapshot, err=>console.error(err));
+
+// ---------- Modal ----------
+const modal=document.getElementById("addMenteeModal");
+const openBtn=document.getElementById("addMenteeBtn");
+const closeBtn=document.getElementById("closeModal");
+const form=document.getElementById("menteeForm");
+
+openBtn.addEventListener("click",()=>modal.classList.remove("hidden"));
+closeBtn.addEventListener("click",()=>modal.classList.add("hidden"));
+
+form.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const name=document.getElementById("name").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const course=document.getElementById("course").value.trim();
+  const completion=Number(document.getElementById("completion").value||0);
+  const risk=document.getElementById("risk").value;
+  if(!name||!email)return alert("Name/email required.");
+  await addMentee({name,email,course,completion_rate:completion,dropoff_risk:risk,createdAt:new Date().toISOString()});
+  modal.classList.add("hidden");
+  form.reset();
+});
+</script>
 </body>
 </html>
