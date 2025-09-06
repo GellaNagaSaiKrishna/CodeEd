@@ -1,35 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mentor Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
-  <!-- single feather import -->
+  <script src="https://unpkg.com/feather-icons"></script>
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-
   <style>
-    .progress-bar { height: 8px; border-radius: 4px; background-color: #e5e7eb; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.35s ease; display:block; }
-    /* completion color */
-    .progress-fill.completion { background-color: #3b82f6; } /* blue-500 */
-    /* risk colors */
-    .progress-fill.risk-low { background-color: #10b981; }    /* green */
-    .progress-fill.risk-medium { background-color: #f59e0b; } /* amber */
-    .progress-fill.risk-high { background-color: #ef4444; }   /* red */
-
-    /* small adjustments */
-    .delete-button { position:absolute; top:0.5rem; right:0.5rem; }
+    .progress-bar {
+      height: 8px;
+      border-radius: 4px;
+      background-color: #e5e7eb;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    .risk-low { background-color: #10b981; }
+    .risk-medium { background-color: #f59e0b; }
+    .risk-high { background-color: #ef4444; }
   </style>
 </head>
 <body class="bg-gray-50">
   <div class="min-h-screen">
+    <!-- Header -->
     <header class="bg-white shadow-sm">
       <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
-        <h1 class="text-3xl font-bold text-gray-900"><i data-feather="users" class="inline mr-2"></i> Mentor Dashboard</h1>
+        <h1 class="text-3xl font-bold text-gray-900">
+          <i data-feather="users" class="inline mr-2"></i> Mentor Dashboard
+        </h1>
         <div class="flex items-center space-x-4">
           <span class="text-gray-600">Welcome, Mentor</span>
           <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
@@ -39,42 +43,19 @@
       </div>
     </header>
 
+    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <div class="mb-8">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Mentees</h2>
         <div id="students-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </div>
     </main>
-  </div>
 
-  <!-- Floating Add Button -->
-  <button id="addMenteeBtn"
-    class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg z-40"
-    title="Add Mentee">
-    <i data-feather="plus" class="w-6 h-6"></i>
-  </button>
-
-  <!-- Add Mentee Modal -->
-  <div id="addMenteeModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-      <h2 class="text-lg font-semibold mb-4">Add New Mentee</h2>
-      <form id="menteeForm" class="space-y-4">
-        <input type="text" id="name" placeholder="Full Name" class="w-full border px-3 py-2 rounded-lg" required />
-        <input type="email" id="email" placeholder="Email" class="w-full border px-3 py-2 rounded-lg" required />
-        <input type="text" id="course" placeholder="Course" class="w-full border px-3 py-2 rounded-lg" required />
-        <input type="number" id="completion" placeholder="Completion %" min="0" max="100" class="w-full border px-3 py-2 rounded-lg" required />
-        <select id="risk" class="w-full border px-3 py-2 rounded-lg" required>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-
-        <div class="flex justify-end space-x-2">
-          <button type="button" id="closeModal" class="px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Add</button>
-        </div>
-      </form>
-    </div>
+    <!-- Floating Add Student Button -->
+    <button id="add-student-btn" 
+      class="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg">
+      <i data-feather="plus" class="w-6 h-6"></i>
+    </button>
   </div>
 
   <script>
@@ -84,17 +65,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      setDoc,
-      doc,
-      deleteDoc,
-      onSnapshot,
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // --- Replace only if different; this is your config from earlier
     const firebaseConfig = {
       apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
       authDomain: "codeed-3416c.firebaseapp.com",
@@ -107,191 +79,79 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const learnersCol = collection(db, "learners");
-    const container = document.getElementById("students-list");
 
-    // Find smallest missing integer for learner_N
-    async function getNextLearnerId() {
-      const snap = await getDocs(learnersCol);
-      const ids = snap.docs.map(d => d.id);
-      // extract numbers from ids that match learner_<num>
-      const nums = ids
-        .map(id => {
-          const m = id.match(/^learner_(\d+)$/);
-          return m ? Number(m[1]) : null;
-        })
-        .filter(n => Number.isInteger(n))
-        .sort((a,b) => a - b);
-
-      // find smallest missing positive integer
-      let next = 1;
-      for (let i = 0; i < nums.length; i++) {
-        if (nums[i] === next) next++;
-        else if (nums[i] > next) break;
-      }
-      return `learner_${next}`;
-    }
-
-    // Add mentee (uses smallest missing id)
-    async function addMentee(data) {
-      try {
-        const id = await getNextLearnerId();
-        await setDoc(doc(db, "learners", id), data);
-        return { success: true, id };
-      } catch (err) {
-        console.error("Add mentee failed:", err);
-        return { success: false, error: err };
-      }
-    }
-
-    // Delete mentee by id
-    async function deleteMentee(id) {
-      if (!id) return;
-      if (!confirm("Are you sure you want to delete this mentee?")) return;
-      try {
-        await deleteDoc(doc(db, "learners", id));
-      } catch (err) {
-        console.error("Delete failed:", err);
-        alert("Failed to delete mentee. Check console for details.");
-      }
-    }
-
-    // render snapshot
-    function renderSnapshot(snapshot) {
+    async function loadStudents() {
+      const querySnapshot = await getDocs(collection(db, "learners"));
+      const container = document.getElementById("students-list");
       container.innerHTML = "";
-      // optional: convert snapshot.docs to an array and sort by numeric id if needed
-      const items = snapshot.docs.map(d => ({ id: d.id, data: d.data() }));
-      // sort by numeric learner number if present (so ordering is predictable)
-      items.sort((a,b) => {
-        const an = (a.id.match(/^learner_(\d+)$/) || [null, 1])[1];
-        const bn = (b.id.match(/^learner_(\d+)$/) || [null, 1])[1];
-        return Number(an) - Number(bn);
-      });
 
-      for (const item of items) {
-        const m = item.data || {};
-        const risk = (m.dropoff_risk || "low").toLowerCase();
-        const completion = Number(m.completion_rate ?? m.completion ?? 0);
+      querySnapshot.forEach((docSnap) => {
+        const learner = docSnap.data();
+        let riskLevel = learner.dropoff_risk || "low";
 
-        const card = document.createElement("div");
-        card.className = "bg-white rounded-lg shadow-md p-6 relative";
-        card.setAttribute("data-aos", "fade-up");
-
-        card.innerHTML = `
-          <button class="delete-button text-red-500 hover:text-red-700" data-id="${item.id}" title="Delete mentee">
-            <i data-feather="trash-2"></i>
-          </button>
-
-          <div class="flex items-center mb-4">
-            <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
-              <i data-feather="user" class="text-blue-600 w-8 h-8"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">${escapeHtml(m.name || "No name")}</h3>
-              <p class="text-gray-600">${escapeHtml(m.course || "")}</p>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <div class="flex justify-between text-sm text-gray-600 mb-1">
-              <span>Course Progress</span>
-              <span>${completion}%</span>
-            </div>
-            <div class="progress-bar">
-              <span class="progress-fill completion" style="width: ${Math.min(Math.max(completion,0),100)}%"></span>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <div class="flex justify-between text-sm text-gray-600 mb-1">
-              <span>Dropout Risk</span>
-              <span>(${escapeHtml(risk)})</span>
-            </div>
-            <div class="progress-bar">
-              <span class="progress-fill risk-${risk}" style="width: ${risk === 'low' ? 33 : risk === 'medium' ? 66 : 100}%"></span>
+        const card = `
+          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div class="p-6 relative">
+              <!-- Delete Button -->
+              <button onclick="deleteStudent('${docSnap.id}')" 
+                class="absolute top-4 right-4 text-red-500 hover:text-red-700">
+                <i data-feather="trash-2"></i>
+              </button>
+              <div class="flex items-center mb-4">
+                <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                  <i data-feather="user" class="text-blue-600 w-8 h-8"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-800">${learner.name}</h3>
+                  <p class="text-gray-600">${learner.course}</p>
+                  <p class="text-sm text-gray-500">${learner.email || "No email available"}</p>
+                </div>
+              </div>
+              <div class="mb-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                  <span>Course Progress</span>
+                  <span>${learner.completion_rate}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-blue-500" style="width: ${learner.completion_rate}%"></div>
+                </div>
+              </div>
+              <div class="mb-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                  <span>Dropout Risk</span>
+                  <span>(${learner.dropoff_risk})</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill risk-${riskLevel.toLowerCase()}" style="width:${riskLevel === 'high' ? '100' : (riskLevel === 'medium' ? '60' : '30')}%"></div>
+                </div>
+              </div>
+              <a href="mentee-details.html?id=${docSnap.id}" 
+                class="block w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-center rounded-md">
+                View Details
+              </a>
             </div>
           </div>
-
-          <a href="mentee-details.html?id=${encodeURIComponent(item.id)}" class="block w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-center rounded-md">
-            View Details
-          </a>
         `;
+        container.insertAdjacentHTML("beforeend", card);
+      });
 
-        container.appendChild(card);
-      }
-
-      // render feather icons in newly created elements
       feather.replace();
-
-      // attach delete handlers
-      container.querySelectorAll(".delete-button").forEach(btn => {
-        btn.addEventListener("click", (ev) => {
-          const id = ev.currentTarget.dataset.id;
-          deleteMentee(id);
-        });
-      });
     }
 
-    // small helper to prevent injection
-    function escapeHtml(text) {
-      return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+    // Delete student function
+    window.deleteStudent = async function(id) {
+      if (confirm("Are you sure you want to delete this student?")) {
+        await deleteDoc(doc(db, "learners", id));
+        loadStudents();
+      }
     }
 
-    // realtime listener: auto updates UI when collection changes
-    const unsubscribe = onSnapshot(learnersCol, (snapshot) => {
-      renderSnapshot(snapshot);
-    }, (err) => {
-      console.error("Realtime listener error:", err);
+    // Add student button
+    document.getElementById("add-student-btn").addEventListener("click", () => {
+      window.location.href = "add-student.html"; // redirect to add student page
     });
 
-    // Modal behavior
-    const modal = document.getElementById("addMenteeModal");
-    const openBtn = document.getElementById("addMenteeBtn");
-    const closeBtn = document.getElementById("closeModal");
-    const form = document.getElementById("menteeForm");
-
-    openBtn.addEventListener("click", () => modal.classList.remove("hidden"));
-    closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const course = document.getElementById("course").value.trim();
-      const completion = Number(document.getElementById("completion").value || 0);
-      const risk = document.getElementById("risk").value;
-
-      // basic validation
-      if (!name || !email) {
-        alert("Please provide name and email.");
-        return;
-      }
-
-      const result = await addMentee({
-        name,
-        email,
-        course,
-        completion_rate: completion,
-        dropoff_risk: risk,
-        createdAt: new Date().toISOString()
-      });
-
-      if (result.success) {
-        modal.classList.add("hidden");
-        form.reset();
-      } else {
-        alert("Failed to add mentee. See console for details.");
-      }
-    });
-
-    // ---- Cleanup before page unload (optional) ----
-    window.addEventListener("beforeunload", () => {
-      try { unsubscribe(); } catch (e) {}
-    });
+    loadStudents();
   </script>
 </body>
 </html>
