@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnEngage | Real-time Learner Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .engagement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i data-feather="book-open" class="text-indigo-600 h-8 w-8"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-900">LearnEngage</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none">
+                        <i data-feather="bell"></i>
+                    </button>
+                    <div class="flex items-center">
+                        <img class="h-8 w-8 rounded-full" src="http://static.photos/people/200x200/42" alt="User profile">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Left Sidebar -->
+            <div class="w-full lg:w-1/4 space-y-6">
+                <!-- Learner Summary -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <img class="h-16 w-16 rounded-full" src="http://static.photos/people/200x200/42" alt="User profile">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Alex Johnson</h3>
+                            <p class="text-gray-500">Data Science Track</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-sm text-gray-500">Completion Rate</p>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 72%"></div>
+                            </div>
+                            <p class="text-right text-sm text-gray-500">72%</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Engagement Score</p>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-green-500 h-2.5 rounded-full" style="width: 85%"></div>
+                            </div>
+                            <p class="text-right text-sm text-gray-500">85/100</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Prediction -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Drop-off Risk</h3>
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Medium</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Activity Level</span>
+                            <span class="font-medium">Declining</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Last Login</span>
+                            <span class="font-medium">2 days ago</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Assessment Scores</span>
+                            <span class="font-medium">Stable</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button class="w-full flex items-center justify-between px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition">
+                            <span>Send Reminder</span>
+                            <i data-feather="clock"></i>
+                        </button>
+                        <button class="w-full flex items-center justify-between px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition">
+                            <span>Micro-assessment</span>
+                            <i data-feather="check-circle"></i>
+                        </button>
+                        <button class="w-full flex items-center justify-between px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition">
+                            <span>Peer Challenge</span>
+                            <i data-feather="users"></i>
+                        </button>
+                        <button class="w-full flex items-center justify-between px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition">
+                            <span>Mentor Connect</span>
+                            <i data-feather="message-square"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard -->
+            <div class="w-full lg:w-3/4 space-y-6">
+                <!-- Engagement Overview -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900">Engagement Overview</h2>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md">Today</button>
+                            <button class="px-3 py-1 text-sm bg-white text-gray-700 rounded-md border">Week</button>
+                            <button class="px-3 py-1 text-sm bg-white text-gray-700 rounded-md border">Month</button>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="engagementChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Nudge Triggers -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">Recent Nudge Triggers</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start p-4 border border-gray-100 rounded-lg engagement-card transition hover:border-indigo-200">
+                            <div class="flex-shrink-0 mt-1">
+                                <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <i data-feather="clock" class="text-indigo-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-medium text-gray-900">Reminder Sent</h3>
+                                    <span class="text-xs text-gray-500">2 hours ago</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">Module 4: Machine Learning Fundamentals has been inactive for 3 days.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start p-4 border border-gray-100 rounded-lg engagement-card transition hover:border-green-200">
+                            <div class="flex-shrink-0 mt-1">
+                                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i data-feather="check-circle" class="text-green-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-medium text-gray-900">Micro-assessment Completed</h3>
+                                    <span class="text-xs text-gray-500">Yesterday</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">Scored 85% on Linear Regression concepts check.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start p-4 border border-gray-100 rounded-lg engagement-card transition hover:border-purple-200">
+                            <div class="flex-shrink-0 mt-1">
+                                <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center pulse">
+                                    <i data-feather="users" class="text-purple-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-medium text-gray-900">Peer Challenge Pending</h3>
+                                    <span class="text-xs text-gray-500">Pending</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">Challenge from Sarah on Neural Networks concepts.</p>
+                                <div class="mt-2 flex space-x-2">
+                                    <button class="px-3 py-1 text-xs bg-purple-600 text-white rounded-md">Accept</button>
+                                    <button class="px-3 py-1 text-xs bg-white text-gray-700 rounded-md border">Decline</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize AOS
+        AOS.init();
+        
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // Engagement Chart
+        const ctx = document.getElementById('engagementChart').getContext('2d');
+        const engagementChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [
+                    {
+                        label: 'Active Time (min)',
+                        data: [45, 52, 60, 55, 48, 30, 25],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Content Viewed',
+                        data: [8, 10, 12, 9, 7, 4, 3],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            
+            // Update engagement score based on time of day
+            let engagementScore = document.querySelector('.engagement-score');
+            if (engagementScore) {
+                // Simulate score fluctuation
+                const baseScore = 85;
+                const variation = Math.sin(hours * 0.26) * 5; // Sinusoidal variation
+                const newScore = Math.round(baseScore + variation);
+                engagementScore.textContent = `${newScore}/100`;
+                
+                // Update progress bar
+                const progressBar = document.querySelector('.engagement-progress');
+                if (progressBar) {
+                    progressBar.style.width = `${newScore}%`;
+                    progressBar.className = `bg-${newScore > 70 ? 'green' : newScore > 50 ? 'yellow' : 'red'}-500 h-2.5 rounded-full`;
+                }
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
