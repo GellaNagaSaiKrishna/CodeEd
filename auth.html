@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Mentor Portal - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .error-box {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+    }
+    .info-box {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Mentor Login</h2>
+
+    <!-- Info box for Firebase setup -->
+    <div class="info-box p-3 rounded-md mb-4 text-sm">
+      <p class="font-semibold">Firebase Setup Required:</p>
+      <p class="mt-1">Enable Email/Password auth in Firebase Console → Authentication → Sign-in method</p>
+    </div>
+
+    <!-- Login/Signup Form -->
+    <form id="authForm" class="space-y-4">
+      <input type="email" id="email" placeholder="Email"
+             class="w-full border px-3 py-2 rounded-lg" required
+             value="saikrishg888@gmail.com">
+      <input type="password" id="password" placeholder="Password"
+             class="w-full border px-3 py-2 rounded-lg" required>
+      <button type="submit" id="submitBtn"
+        class="w-full py-2 bg-indigo-600 text-white rounded-lg flex items-center justify-center">
+        <span id="buttonText">Login</span>
+        <svg id="loadingSpinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </button>
+    </form>
+
+    <p id="toggleAuth"
+      class="text-sm text-center mt-4 text-indigo-600 cursor-pointer hover:text-indigo-800">
+      Don't have an account? Sign Up
+    </p>
+
+    <!-- Error message container -->
+    <div id="errorMessage" class="error-box p-3 rounded-md mt-4 text-sm hidden"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
+      authDomain: "codeed-3416c.firebaseapp.com",
+      projectId: "codeed-3416c",
+      storageBucket: "codeed-3416c.appspot.com",
+      messagingSenderId: "701222817406",
+      appId: "1:701222817406:web:809d58b9660342cc12122f",
+      measurementId: "G-ZY9KGPJC66"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const form = document.getElementById("authForm");
+    const toggleAuth = document.getElementById("toggleAuth");
+    const errorMessage = document.getElementById("errorMessage");
+    const submitBtn = document.getElementById("submitBtn");
+    const buttonText = document.getElementById("buttonText");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+
+    let isSignup = false;
+
+    toggleAuth.addEventListener("click", () => {
+      isSignup = !isSignup;
+      buttonText.textContent = isSignup ? "Sign Up" : "Login";
+      toggleAuth.textContent = isSignup
+        ? "Already have an account? Login"
+        : "Don't have an account? Sign Up";
+      errorMessage.classList.add("hidden");
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      // Show loading state
+      setLoadingState(true);
+      errorMessage.classList.add("hidden");
+
+      try {
+        if (isSignup) {
+          await createUserWithEmailAndPassword(auth, email, password);
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+        }
+        // Success - redirect to dashboard
+        window.location.href = "index.html";
+      } catch (err) {
+        // Handle specific error cases
+        let errorMsg = "An error occurred during authentication.";
+        
+        switch(err.code) {
+          case "auth/operation-not-allowed":
+            errorMsg = "Email/password authentication is not enabled. Please enable it in Firebase Console.";
+            break;
+          case "auth/email-already-in-use":
+            errorMsg = "This email is already registered. Please login instead.";
+            break;
+          case "auth/invalid-email":
+            errorMsg = "Invalid email address format.";
+            break;
+          case "auth/weak-password":
+            errorMsg = "Password should be at least 6 characters.";
+            break;
+          case "auth/user-not-found":
+            errorMsg = "No account found with this email.";
+            break;
+          case "auth/wrong-password":
+            errorMsg = "Incorrect password.";
+            break;
+          default:
+            errorMsg = err.message || "Authentication failed. Please try again.";
+        }
+        
+        showError(errorMsg);
+      } finally {
+        setLoadingState(false);
+      }
+    });
+
+    // Redirect if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "index.html";
+      }
+    });
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.remove("hidden");
+    }
+
+    function setLoadingState(isLoading) {
+      if (isLoading) {
+        submitBtn.classList.add("loading");
+        loadingSpinner.classList.remove("hidden");
+      } else {
+        submitBtn.classList.remove("loading");
+        loadingSpinner.classList.add("hidden");
+      }
+    }
+  </script>
+</body>
+</html>
