@@ -7,21 +7,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
-  <!-- single feather import -->
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 
   <style>
     .progress-bar { height: 8px; border-radius: 4px; background-color: #e5e7eb; overflow: hidden; }
     .progress-fill { height: 100%; border-radius: 4px; transition: width 0.35s ease; display:block; }
-    /* completion color */
-    .progress-fill.completion { background-color: #3b82f6; } /* blue-500 */
-    /* risk colors */
-    .progress-fill.risk-low { background-color: #10b981; }    /* green */
-    .progress-fill.risk-medium { background-color: #f59e0b; } /* amber */
-    .progress-fill.risk-high { background-color: #ef4444; }   /* red */
-
-    /* small adjustments */
+    .progress-fill.completion { background-color: #3b82f6; }
+    .progress-fill.risk-low { background-color: #10b981; }
+    .progress-fill.risk-medium { background-color: #f59e0b; }
+    .progress-fill.risk-high { background-color: #ef4444; }
     .delete-button { position:absolute; top:0.5rem; right:0.5rem; }
   </style>
 </head>
@@ -94,7 +88,6 @@
       onSnapshot,
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // --- Replace only if different; this is your config from earlier
     const firebaseConfig = {
       apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
       authDomain: "codeed-3416c.firebaseapp.com",
@@ -110,20 +103,15 @@
     const learnersCol = collection(db, "learners");
     const container = document.getElementById("students-list");
 
-    // Find smallest missing integer for learner_N
     async function getNextLearnerId() {
       const snap = await getDocs(learnersCol);
       const ids = snap.docs.map(d => d.id);
-      // extract numbers from ids that match learner_<num>
-      const nums = ids
-        .map(id => {
+      const nums = ids.map(id => {
           const m = id.match(/^learner_(\d+)$/);
           return m ? Number(m[1]) : null;
         })
         .filter(n => Number.isInteger(n))
         .sort((a,b) => a - b);
-
-      // find smallest missing positive integer
       let next = 1;
       for (let i = 0; i < nums.length; i++) {
         if (nums[i] === next) next++;
@@ -132,7 +120,6 @@
       return `learner_${next}`;
     }
 
-    // Add mentee (uses smallest missing id)
     async function addMentee(data) {
       try {
         const id = await getNextLearnerId();
@@ -144,7 +131,6 @@
       }
     }
 
-    // Delete mentee by id
     async function deleteMentee(id) {
       if (!id) return;
       if (!confirm("Are you sure you want to delete this mentee?")) return;
@@ -156,22 +142,18 @@
       }
     }
 
-    // render snapshot
     function renderSnapshot(snapshot) {
       container.innerHTML = "";
-      // optional: convert snapshot.docs to an array and sort by numeric id if needed
       const items = snapshot.docs.map(d => ({ id: d.id, data: d.data() }));
-      // sort by numeric learner number if present (so ordering is predictable)
-      items.sort((a,b) => {
-        const an = (a.id.match(/^learner_(\d+)$/) || [null, 1])[1];
-        const bn = (b.id.match(/^learner_(\d+)$/) || [null, 1])[1];
-        return Number(an) - Number(bn);
-      });
+      // Sort by dropout risk descending (high > medium > low)
+      const riskWeight = { high: 3, medium: 2, low: 1 };
+      items.sort((a,b) => (riskWeight[b.data.dropoff_risk] || 0) - (riskWeight[a.data.dropoff_risk] || 0));
 
       for (const item of items) {
         const m = item.data || {};
         const risk = (m.dropoff_risk || "low").toLowerCase();
-        const completion = Number(m.completion_rate ?? m.completion ?? 0);
+        const completion = Number(m.completion_rate ?? 0);
+        const email = m.email || m.mail || m.emailId || "No email provided";
 
         const card = document.createElement("div");
         card.className = "bg-white rounded-lg shadow-md p-6 relative";
@@ -181,7 +163,6 @@
           <button class="delete-button text-red-500 hover:text-red-700" data-id="${item.id}" title="Delete mentee">
             <i data-feather="trash-2"></i>
           </button>
-
           <div class="flex items-center mb-4">
             <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
               <i data-feather="user" class="text-blue-600 w-8 h-8"></i>
@@ -189,9 +170,9 @@
             <div>
               <h3 class="text-lg font-semibold text-gray-800">${escapeHtml(m.name || "No name")}</h3>
               <p class="text-gray-600">${escapeHtml(m.course || "")}</p>
+              <p class="text-gray-500 text-sm">${escapeHtml(email)}</p>
             </div>
           </div>
-
           <div class="mb-4">
             <div class="flex justify-between text-sm text-gray-600 mb-1">
               <span>Course Progress</span>
@@ -201,7 +182,6 @@
               <span class="progress-fill completion" style="width: ${Math.min(Math.max(completion,0),100)}%"></span>
             </div>
           </div>
-
           <div class="mb-4">
             <div class="flex justify-between text-sm text-gray-600 mb-1">
               <span>Dropout Risk</span>
@@ -211,7 +191,6 @@
               <span class="progress-fill risk-${risk}" style="width: ${risk === 'low' ? 33 : risk === 'medium' ? 66 : 100}%"></span>
             </div>
           </div>
-
           <a href="mentee-details.html?id=${encodeURIComponent(item.id)}" class="block w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-center rounded-md">
             View Details
           </a>
@@ -219,11 +198,7 @@
 
         container.appendChild(card);
       }
-
-      // render feather icons in newly created elements
       feather.replace();
-
-      // attach delete handlers
       container.querySelectorAll(".delete-button").forEach(btn => {
         btn.addEventListener("click", (ev) => {
           const id = ev.currentTarget.dataset.id;
@@ -232,7 +207,6 @@
       });
     }
 
-    // small helper to prevent injection
     function escapeHtml(text) {
       return String(text)
         .replace(/&/g, "&amp;")
@@ -241,14 +215,12 @@
         .replace(/"/g, "&quot;");
     }
 
-    // realtime listener: auto updates UI when collection changes
     const unsubscribe = onSnapshot(learnersCol, (snapshot) => {
       renderSnapshot(snapshot);
     }, (err) => {
       console.error("Realtime listener error:", err);
     });
 
-    // Modal behavior
     const modal = document.getElementById("addMenteeModal");
     const openBtn = document.getElementById("addMenteeBtn");
     const closeBtn = document.getElementById("closeModal");
@@ -265,7 +237,6 @@
       const completion = Number(document.getElementById("completion").value || 0);
       const risk = document.getElementById("risk").value;
 
-      // basic validation
       if (!name || !email) {
         alert("Please provide name and email.");
         return;
@@ -288,7 +259,6 @@
       }
     });
 
-    // ---- Cleanup before page unload (optional) ----
     window.addEventListener("beforeunload", () => {
       try { unsubscribe(); } catch (e) {}
     });
