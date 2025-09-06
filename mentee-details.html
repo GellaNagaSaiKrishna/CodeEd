@@ -1,354 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentee Details</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .progress-bar {
-            height: 8px;
-            border-radius: 4px;
-            background-color: #e5e7eb;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-        .risk-low { background-color: #10b981; }
-        .risk-medium { background-color: #f59e0b; }
-        .risk-high { background-color: #ef4444; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mentee Details</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9fafb;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .card {
+      margin: 15px 0;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f1f5f9;
+    }
+
+    .label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 16px;
+      background: #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .risk-low { background: #22c55e; }
+    .risk-medium { background: #eab308; }
+    .risk-high { background: #ef4444; }
+
+    .info {
+      margin-top: 6px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
 </head>
-<body class="bg-gray-50">
-    <div class="min-h-screen">
-        <!-- Header -->
-        <header class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
-                <div class="flex items-center">
-                    <a href="index.html" class="mr-4 text-gray-600 hover:text-gray-900">
-                        <i data-feather="arrow-left"></i>
-                    </a>
-                    <h1 class="text-3xl font-bold text-gray-900">
-                        <i data-feather="user" class="inline mr-2"></i> Mentee Details
-                    </h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-gray-600">Mentor Dashboard</span>
-                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                        <i data-feather="user" class="text-indigo-600"></i>
-                    </div>
-                </div>
-            </div>
-        </header>
+<body>
+  <div class="container">
+    <h2>Loading...</h2>
 
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8" data-aos="fade-up">
-                <div class="p-6">
-                    <div class="flex flex-col md:flex-row items-center md:items-start mb-6">
-                        <div class="h-24 w-24 rounded-full bg-blue-100 flex items-center justify-center mr-6 mb-4 md:mb-0">
-                            <i data-feather="user" class="text-blue-600 w-12 h-12"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h2 class="text-2xl font-bold text-gray-800 mb-1">Alex Johnson</h2>
-                            <p class="text-lg text-gray-600 mb-2">Web Development Bootcamp</p>
-                            <div class="flex flex-wrap gap-4">
-                                <div class="flex items-center text-gray-600">
-                                    <i data-feather="mail" class="w-4 h-4 mr-2"></i>
-                                    <span>alex.johnson@example.com</span>
-                                </div>
-                                <div class="flex items-center text-gray-600">
-                                    <i data-feather="phone" class="w-4 h-4 mr-2"></i>
-                                    <span>(555) 123-4567</span>
-                                </div>
-                                <div class="flex items-center text-gray-600">
-                                    <i data-feather="calendar" class="w-4 h-4 mr-2"></i>
-                                    <span>Joined: Jan 15, 2023</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4 md:mt-0">
-                            <button class="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors duration-300 flex items-center">
-                                <i data-feather="message-square" class="w-4 h-4 mr-2"></i> Send Message
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                <!-- Progress Card -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden" data-aos="fade-up">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i data-feather="bar-chart-2" class="w-5 h-5 mr-2 text-blue-500"></i> Course Progress
-                        </h3>
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                <span>Overall Completion</span>
-                                <span>65%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill bg-blue-500" style="width: 65%"></div>
-                            </div>
-                        </div>
-                        <div class="space-y-3">
-                            <div>
-                                <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                    <span>HTML/CSS</span>
-                                    <span>80%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill bg-green-500" style="width: 80%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                    <span>JavaScript</span>
-                                    <span>45%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill bg-yellow-500" style="width: 45%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                    <span>React</span>
-                                    <span>30%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill bg-red-500" style="width: 30%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Risk Assessment Card -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="100">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i data-feather="alert-triangle" class="w-5 h-5 mr-2 text-orange-500"></i> Risk Assessment
-                        </h3>
-                        <div class="mb-6">
-                            <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                <span>Dropout Risk</span>
-                                <span>Medium (45%)</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill risk-medium" style="width: 45%"></div>
-                            </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-sm font-medium text-gray-700">Activity Level</span>
-                                    <span class="text-sm text-gray-500">5/10</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill bg-blue-500" style="width: 50%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-sm font-medium text-gray-700">Assignment Scores</span>
-                                    <span class="text-sm text-gray-500">72% avg</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill bg-purple-500" style="width: 72%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-sm font-medium text-gray-700">Engagement</span>
-                                    <span class="text-sm text-gray-500">3/5</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill bg-green-500" style="width: 60%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activity Card -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden" data-aos="fade-up" data-aos-delay="200">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i data-feather="activity" class="w-5 h-5 mr-2 text-purple-500"></i> Recent Activity
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="flex items-start">
-                                <div class="bg-blue-100 p-2 rounded-full mr-3">
-                                    <i data-feather="check-circle" class="w-4 h-4 text-blue-600"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Completed HTML Basics module</p>
-                                    <p class="text-xs text-gray-500">Today, 10:45 AM</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start">
-                                <div class="bg-green-100 p-2 rounded-full mr-3">
-                                    <i data-feather="award" class="w-4 h-4 text-green-600"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Scored 85% on CSS Quiz</p>
-                                    <p class="text-xs text-gray-500">Yesterday, 3:20 PM</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start">
-                                <div class="bg-yellow-100 p-2 rounded-full mr-3">
-                                    <i data-feather="alert-circle" class="w-4 h-4 text-yellow-600"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Missed JavaScript live session</p>
-                                    <p class="text-xs text-gray-500">2 days ago</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start">
-                                <div class="bg-purple-100 p-2 rounded-full mr-3">
-                                    <i data-feather="message-square" class="w-4 h-4 text-purple-600"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Asked question in forum</p>
-                                    <p class="text-xs text-gray-500">3 days ago, 11:15 AM</p>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="mt-4 text-sm text-indigo-600 hover:text-indigo-800 flex items-center">
-                            View all activity <i data-feather="chevron-right" class="w-4 h-4 ml-1"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <!-- Progress Chart -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden p-6" data-aos="fade-up">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i data-feather="trending-up" class="w-5 h-5 mr-2 text-blue-500"></i> Progress Over Time
-                    </h3>
-                    <div class="h-64">
-                        <canvas id="progressChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Engagement Chart -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden p-6" data-aos="fade-up" data-aos-delay="100">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i data-feather="bar-chart" class="w-5 h-5 mr-2 text-purple-500"></i> Weekly Engagement
-                    </h3>
-                    <div class="h-64">
-                        <canvas id="engagementChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notes Section -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8" data-aos="fade-up">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i data-feather="edit" class="w-5 h-5 mr-2 text-green-500"></i> Mentor Notes
-                    </h3>
-                    <div class="mb-4 p-4 bg-gray-50 rounded-lg">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-sm font-medium text-gray-800">Progress Check-in</span>
-                            <span class="text-xs text-gray-500">Feb 15, 2023</span>
-                        </div>
-                        <p class="text-sm text-gray-600">Alex is making steady progress with HTML/CSS but seems to be struggling with JavaScript concepts. Recommended additional practice exercises and scheduled a 1:1 session for next week.</p>
-                    </div>
-                    <div class="mb-4 p-4 bg-gray-50 rounded-lg">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-sm font-medium text-gray-800">Initial Assessment</span>
-                            <span class="text-xs text-gray-500">Jan 20, 2023</span>
-                        </div>
-                        <p class="text-sm text-gray-600">Alex showed enthusiasm during the orientation session. Needs to work on time management skills as mentioned they have a full-time job alongside this course.</p>
-                    </div>
-                    <textarea class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" rows="3" placeholder="Add new note..."></textarea>
-                    <button class="mt-2 py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors duration-300">
-                        Save Note
-                    </button>
-                </div>
-            </div>
-        </main>
+    <div class="card">
+      <span class="label">Course:</span>
+      <div id="courseName" class="info">Loading...</div>
     </div>
 
-    <script>
-        AOS.init();
-        feather.replace();
+    <div class="card">
+      <span class="label">Email:</span>
+      <div id="menteeEmail" class="info">Loading...</div>
+    </div>
 
-        // Initialize charts
-        document.addEventListener('DOMContentLoaded', function() {
-            // Progress Chart
-            const progressCtx = document.getElementById('progressChart').getContext('2d');
-            const progressChart = new Chart(progressCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
-                    datasets: [{
-                        label: 'Course Completion %',
-                        data: [5, 15, 25, 35, 50, 65],
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.3,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+    <div class="card">
+      <span class="label">Last Login:</span>
+      <div id="menteeLogin" class="info">Loading...</div>
+    </div>
 
-            // Engagement Chart
-            const engagementCtx = document.getElementById('engagementChart').getContext('2d');
-            const engagementChart = new Chart(engagementCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Minutes Active',
-                        data: [45, 60, 30, 75, 50, 20, 0],
-                        backgroundColor: '#8b5cf6',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + ' min';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    </script>
+    <div class="card">
+      <span class="label">Overall Completion:</span>
+      <div id="overallCompletion" class="info">0%</div>
+      <div class="progress-bar">
+        <div id="completionBar" class="progress-fill" style="background:#3b82f6;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="label">Dropoff Risk:</span>
+      <div id="dropoffRisk" class="info">Loading...</div>
+      <div class="progress-bar">
+        <div id="riskBar" class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+    // 🔹 Replace with your actual Firebase config
+    const firebaseConfig = {
+  apiKey: "AIzaSyC2dFk4Lp7Oq9Rs1Uv3Wx5Yz7B9D1E3F5G7", // This is a unique key, obtain it from your project settings if you need the exact one.
+  authDomain: "codeed-3416c.firebaseapp.com",
+  projectId: "codeed-3416c",
+  storageBucket: "codeed-3416c.appspot.com",
+  messagingSenderId: "701222817406",
+  appId: "1:701222817406:web:yourwebappidhere", // This 'appId' is unique to your web app registration.
+  measurementId: "G-503993281"
+};
+
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadMentee() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+      console.log("URL param id =", id);
+
+      if (!id) {
+        alert("No student id in URL");
+        return;
+      }
+
+      try {
+        const ref = doc(db, "learners", id);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          const s = snap.data();
+          console.log("Firestore data:", s);
+
+          document.querySelector("h2").textContent = s.name || "No Name";
+          document.querySelector("#courseName").textContent = s.course || "N/A";
+          document.querySelector("#menteeEmail").textContent = s.email || "N/A";
+          //document.querySelector("#menteeLogin").textContent = s.last_login || "N/A";
+                    if (s.last_login) {
+            let loginTime;
+            if (s.last_login.toDate) {
+                // Firestore Timestamp object
+                loginTime = s.last_login.toDate().toLocaleString();
+            } else {
+                // Fallback: string or number
+                loginTime = new Date(s.last_login).toLocaleString();
+            }
+            document.querySelector("#menteeLogin").textContent = loginTime;
+            } else {
+            document.querySelector("#menteeLogin").textContent = "N/A";
+            }
+
+
+          // Completion
+          document.querySelector("#overallCompletion").textContent = (s.completion_rate || 0) + "%";
+          document.querySelector("#completionBar").style.width = (s.completion_rate || 0) + "%";
+
+          // Dropoff risk
+          const risk = (s.dropoff_risk || "low").toLowerCase();
+          document.querySelector("#dropoffRisk").textContent = risk;
+
+          const riskBar = document.querySelector("#riskBar");
+          riskBar.className = "progress-fill risk-" + risk;
+
+          let riskWidth = 0;
+          if (risk === "low") riskWidth = 20;
+          if (risk === "medium") riskWidth = 50;
+          if (risk === "high") riskWidth = 80;
+          riskBar.style.width = riskWidth + "%";
+
+        } else {
+          console.error("No such student in Firestore!");
+          alert("No such student in Firestore!");
+        }
+      } catch (err) {
+        console.error("Error fetching Firestore data:", err);
+        alert("Error loading student. See console for details.");
+      }
+    }
+
+    loadMentee();
+  </script>
 </body>
 </html>
