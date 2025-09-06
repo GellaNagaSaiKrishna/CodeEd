@@ -2,340 +2,295 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mentor Login</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Mentor Portal - Login</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      background: linear-gradient(135deg, #6e8efb, #a777e3);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
     }
-    .login-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      width: 100%;
-      max-width: 420px;
-      overflow: hidden;
-    }
-    .header {
-      background: #6e8efb;
-      padding: 25px;
-      text-align: center;
-    }
-    .form-container {
-      padding: 30px;
-    }
-    .input-group {
-      margin-bottom: 20px;
-      position: relative;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #555;
-    }
-    input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 16px;
-      transition: border 0.3s;
-    }
-    input:focus {
-      outline: none;
-      border-color: #6e8efb;
-      box-shadow: 0 0 0 2px rgba(110, 142, 251, 0.2);
-    }
-    .password-toggle {
-      position: absolute;
-      right: 12px;
-      top: 40px;
-      cursor: pointer;
-      color: #777;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      background: #6e8efb;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #5a7df9;
+    .error-box {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
     }
     .info-box {
       background-color: #eff6ff;
       border: 1px solid #bfdbfe;
       color: #1d4ed8;
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      font-size: 14px;
     }
-    .info-title {
-      font-weight: 600;
-      margin-bottom: 5px;
+    .password-container {
+      position: relative;
     }
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .footer a {
-      color: #6e8efb;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .footer a:hover {
-      text-decoration: underline;
-    }
-    .error-message {
-      color: #e74c3c;
-      font-size: 14px;
-      margin-top: 8px;
-      display: none;
-      text-align: center;
-      padding: 10px;
-      background: #fef2f2;
-      border-radius: 6px;
-      border: 1px solid #fecaca;
-    }
-    .success-message {
-      color: #2ecc71;
-      font-size: 14px;
-      margin-top: 8px;
-      display: none;
-      text-align: center;
-    }
-    .mode-toggle {
-      text-align: center;
-      margin-top: 20px;
-      color: #6e8efb;
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 12px;
       cursor: pointer;
-      font-weight: 500;
+      color: #6b7280;
     }
-    .mode-toggle:hover {
-      text-decoration: underline;
+    .password-match {
+      color: #059669;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+    .password-mismatch {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: none;
     }
   </style>
 </head>
-<body>
-  <div class="login-card">
-    <div class="header">
-      <h1 class="text-2xl font-bold text-white">Mentor Login</h1>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Mentor Login</h2>
+
+    <!-- Info box for Firebase setup -->
+    <div class="info-box p-3 rounded-md mb-4 text-sm">
+      <p class="font-semibold">Firebase Setup Required:</p>
+      <p class="mt-1">Enable Email/Password auth in Firebase Console → Authentication → Sign-in method</p>
     </div>
-    
-    <div class="form-container">
-      <div class="info-box">
-        <div class="info-title">Firebase Setup Required:</div>
-        <div>Enable Email/Password auth in Firebase Console → Authentication → Sign-in method</div>
+
+    <!-- Login/Signup Form -->
+    <form id="authForm" class="space-y-4">
+      <div>
+        <input type="email" id="email" placeholder="Email"
+               class="w-full border px-3 py-2 rounded-lg" required
+               value="saikrishg888@gmail.com">
       </div>
-
-      <form id="authForm">
-        <div class="input-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" value="saikrishg888@gmail.com" readonly
-                 onfocus="this.removeAttribute('readonly');" autocomplete="email">
-        </div>
-        
-        <div class="input-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
-          <span class="password-toggle" id="passwordToggle">
-            <i class="far fa-eye"></i>
-          </span>
-        </div>
-
-        <div id="confirmPasswordGroup" class="input-group" style="display: none;">
-          <label for="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" placeholder="Confirm your password">
-          <span class="password-toggle" id="confirmPasswordToggle">
-            <i class="far fa-eye"></i>
-          </span>
-          <div id="passwordMatch" style="color: #059669; font-size: 0.875rem; margin-top: 0.25rem; display: none;">
-            ✓ Passwords match
-          </div>
-          <div id="passwordMismatch" style="color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem; display: none;">
-            ✗ Passwords do not match
-          </div>
-        </div>
-
-        <button type="submit" id="submitBtn">
-          <span id="buttonText">Login</span>
-        </button>
-      </form>
-
-      <div class="error-message" id="errorMessage"></div>
-      <div class="success-message" id="successMessage"></div>
-
-      <div class="mode-toggle" id="modeToggle">
-        Don't have an account? Sign Up
+      
+      <div class="password-container">
+        <input type="password" id="password" placeholder="Password"
+               class="w-full border px-3 py-2 rounded-lg pr-10" required>
+        <span class="toggle-password" id="togglePassword">
+          👁️
+        </span>
       </div>
-    </div>
+      
+      <!-- Confirm Password Field (only shown during signup) -->
+      <div class="password-container" id="confirmPasswordContainer" style="display: none;">
+        <input type="password" id="confirmPassword" placeholder="Confirm Password"
+               class="w-full border px-3 py-2 rounded-lg pr-10">
+        <span class="toggle-password" id="toggleConfirmPassword">
+          👁️
+        </span>
+        <div id="passwordMatch" class="password-match">
+          ✓ Passwords match
+        </div>
+        <div id="passwordMismatch" class="password-mismatch">
+          ✗ Passwords do not match
+        </div>
+      </div>
+      
+      <button type="submit" id="submitBtn"
+        class="w-full py-2 bg-indigo-600 text-white rounded-lg flex items-center justify-center">
+        <span id="buttonText">Login</span>
+        <svg id="loadingSpinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </button>
+    </form>
+
+    <p id="toggleAuth"
+      class="text-sm text-center mt-4 text-indigo-600 cursor-pointer hover:text-indigo-800">
+      Don't have an account? Sign Up
+    </p>
+
+    <!-- Error message container -->
+    <div id="errorMessage" class="error-box p-3 rounded-md mt-4 text-sm hidden"></div>
   </div>
 
-  <script>
-    // DOM elements
-    const authForm = document.getElementById('authForm');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const passwordToggle = document.getElementById('passwordToggle');
-    const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
-    const passwordMatch = document.getElementById('passwordMatch');
-    const passwordMismatch = document.getElementById('passwordMismatch');
-    const errorMessage = document.getElementById('errorMessage');
-    const successMessage = document.getElementById('successMessage');
-    const modeToggle = document.getElementById('modeToggle');
-    const submitBtn = document.getElementById('submitBtn');
-    const buttonText = document.getElementById('buttonText');
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-    let isLoginMode = true;
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
+      authDomain: "codeed-3416c.firebaseapp.com",
+      projectId: "codeed-3416c",
+      storageBucket: "codeed-3416c.appspot.com",
+      messagingSenderId: "701222817406",
+      appId: "1:701222817406:web:809d58b9660342cc12122f",
+      measurementId: "G-ZY9KGPJC66"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const form = document.getElementById("authForm");
+    const toggleAuth = document.getElementById("toggleAuth");
+    const errorMessage = document.getElementById("errorMessage");
+    const submitBtn = document.getElementById("submitBtn");
+    const buttonText = document.getElementById("buttonText");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+    const confirmPasswordContainer = document.getElementById("confirmPasswordContainer");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const passwordMatch = document.getElementById("passwordMatch");
+    const passwordMismatch = document.getElementById("passwordMismatch");
+    const togglePassword = document.getElementById("togglePassword");
+    const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+
+    let isSignup = false;
+
+    // Toggle between login and signup modes
+    toggleAuth.addEventListener("click", () => {
+      isSignup = !isSignup;
+      buttonText.textContent = isSignup ? "Sign Up" : "Login";
+      toggleAuth.textContent = isSignup
+        ? "Already have an account? Login"
+        : "Don't have an account? Sign Up";
+      
+      // Show/hide confirm password field
+      confirmPasswordContainer.style.display = isSignup ? "block" : "none";
+      confirmPassword.required = isSignup;
+      
+      errorMessage.classList.add("hidden");
+      clearPasswordValidation();
+    });
 
     // Toggle password visibility
-    passwordToggle.addEventListener('click', () => {
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        passwordToggle.innerHTML = '<i class="far fa-eye-slash"></i>';
+    togglePassword.addEventListener("click", () => {
+      const passwordField = document.getElementById("password");
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        togglePassword.textContent = "🔒";
       } else {
-        passwordInput.type = 'password';
-        passwordToggle.innerHTML = '<i class="far fa-eye"></i>';
+        passwordField.type = "password";
+        togglePassword.textContent = "👁️";
       }
     });
 
     // Toggle confirm password visibility
-    confirmPasswordToggle.addEventListener('click', () => {
-      if (confirmPasswordInput.type === 'password') {
-        confirmPasswordInput.type = 'text';
-        confirmPasswordToggle.innerHTML = '<i class="far fa-eye-slash"></i>';
+    toggleConfirmPassword.addEventListener("click", () => {
+      if (confirmPassword.type === "password") {
+        confirmPassword.type = "text";
+        toggleConfirmPassword.textContent = "🔒";
       } else {
-        confirmPasswordInput.type = 'password';
-        confirmPasswordToggle.innerHTML = '<i class="far fa-eye"></i>';
+        confirmPassword.type = "password";
+        toggleConfirmPassword.textContent = "👁️";
       }
     });
 
-    // Check password match in real-time
-    confirmPasswordInput.addEventListener('input', checkPasswordMatch);
-    passwordInput.addEventListener('input', checkPasswordMatch);
+    // Validate password match in real-time
+    confirmPassword.addEventListener("input", validatePasswordMatch);
+    document.getElementById("password").addEventListener("input", validatePasswordMatch);
 
-    function checkPasswordMatch() {
-      if (!isLoginMode) {
-        if (confirmPasswordInput.value === '') {
-          passwordMatch.style.display = 'none';
-          passwordMismatch.style.display = 'none';
-        } else if (passwordInput.value === confirmPasswordInput.value) {
-          passwordMatch.style.display = 'block';
-          passwordMismatch.style.display = 'none';
-        } else {
-          passwordMatch.style.display = 'none';
-          passwordMismatch.style.display = 'block';
-        }
+    function validatePasswordMatch() {
+      if (!isSignup) return;
+      
+      const password = document.getElementById("password").value;
+      const confirm = confirmPassword.value;
+      
+      if (confirm.length === 0) {
+        passwordMatch.style.display = "none";
+        passwordMismatch.style.display = "none";
+        return;
+      }
+      
+      if (password === confirm) {
+        passwordMatch.style.display = "block";
+        passwordMismatch.style.display = "none";
+      } else {
+        passwordMatch.style.display = "none";
+        passwordMismatch.style.display = "block";
       }
     }
 
-    // Toggle between login and signup modes
-    modeToggle.addEventListener('click', () => {
-      isLoginMode = !isLoginMode;
-      
-      if (isLoginMode) {
-        buttonText.textContent = 'Login';
-        modeToggle.textContent = "Don't have an account? Sign Up";
-        confirmPasswordGroup.style.display = 'none';
-      } else {
-        buttonText.textContent = 'Sign Up';
-        modeToggle.textContent = "Already have an account? Login";
-        confirmPasswordGroup.style.display = 'block';
-      }
-      
-      // Clear messages
-      errorMessage.style.display = 'none';
-      successMessage.style.display = 'none';
-    });
+    function clearPasswordValidation() {
+      passwordMatch.style.display = "none";
+      passwordMismatch.style.display = "none";
+      confirmPassword.value = "";
+    }
 
-    // Form submission
-    authForm.addEventListener('submit', (e) => {
+    // Form submission handler
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      
-      const email = emailInput.value;
-      const password = passwordInput.value;
-      const confirmPassword = confirmPasswordInput.value;
-      
-      // Validate form
-      if (!email || !password) {
-        showError('Please fill in all fields');
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const confirm = confirmPassword.value;
+
+      // Validate passwords match during signup
+      if (isSignup && password !== confirm) {
+        showError("Passwords do not match. Please check and try again.");
         return;
       }
-      
-      if (!isLoginMode && password !== confirmPassword) {
-        showError('Passwords do not match');
-        return;
-      }
-      
-      // Simulate authentication (in a real app, this would connect to Firebase)
-      if (isLoginMode) {
-        simulateLogin(email, password);
-      } else {
-        simulateSignUp(email, password);
+
+      // Show loading state
+      setLoadingState(true);
+      errorMessage.classList.add("hidden");
+
+      try {
+        if (isSignup) {
+          await createUserWithEmailAndPassword(auth, email, password);
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+        }
+        // Success - redirect to dashboard
+        window.location.href = "index.html";
+      } catch (err) {
+        // Handle specific error cases
+        let errorMsg = "An error occurred during authentication.";
+        
+        switch(err.code) {
+          case "auth/operation-not-allowed":
+            errorMsg = "Email/password authentication is not enabled. Please enable it in Firebase Console.";
+            break;
+          case "auth/email-already-in-use":
+            errorMsg = "This email is already registered. Please login instead.";
+            break;
+          case "auth/invalid-email":
+            errorMsg = "Invalid email address format.";
+            break;
+          case "auth/weak-password":
+            errorMsg = "Password should be at least 6 characters.";
+            break;
+          case "auth/user-not-found":
+            errorMsg = "No account found with this email.";
+            break;
+          case "auth/wrong-password":
+            errorMsg = "Incorrect password.";
+            break;
+          default:
+            errorMsg = err.message || "Authentication failed. Please try again.";
+        }
+        
+        showError(errorMsg);
+      } finally {
+        setLoadingState(false);
       }
     });
 
-    function simulateLogin(email, password) {
-      // This is a simulation - in a real app, you would use Firebase Auth here
-      showSuccess('Login successful! Redirecting...');
-      
-      // Simulate API call delay
-      setTimeout(() => {
-        // In a real application, you would redirect to the dashboard
-        // window.location.href = 'dashboard.html';
-        alert('Login would be successful with Firebase configured');
-      }, 1500);
-    }
-
-    function simulateSignUp(email, password) {
-      // This is a simulation - in a real app, you would use Firebase Auth here
-      showSuccess('Account created successfully! Redirecting...');
-      
-      // Simulate API call delay
-      setTimeout(() => {
-        // In a real application, you would redirect to the dashboard
-        // window.location.href = 'dashboard.html';
-        alert('Account would be created with Firebase configured');
-      }, 1500);
-    }
+    // Redirect if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "index.html";
+      }
+    });
 
     function showError(message) {
       errorMessage.textContent = message;
-      errorMessage.style.display = 'block';
-      successMessage.style.display = 'none';
+      errorMessage.classList.remove("hidden");
     }
 
-    function showSuccess(message) {
-      successMessage.textContent = message;
-      successMessage.style.display = 'block';
-      errorMessage.style.display = 'none';
-    }
-
-    // Initialize the page
-    emailInput.addEventListener('focus', function() {
-      if (this.hasAttribute('readonly')) {
-        this.removeAttribute('readonly');
-        // Select the email for easy editing
-        this.select();
+    function setLoadingState(isLoading) {
+      if (isLoading) {
+        submitBtn.classList.add("loading");
+        loadingSpinner.classList.remove("hidden");
+      } else {
+        submitBtn.classList.remove("loading");
+        loadingSpinner.classList.add("hidden");
       }
-    });
+    }
   </script>
 </body>
 </html>
