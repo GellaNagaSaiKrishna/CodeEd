@@ -25,10 +25,11 @@
       <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
         <h1 class="text-3xl font-bold text-gray-900"><i data-feather="users" class="inline mr-2"></i> Mentor Dashboard</h1>
         <div class="flex items-center space-x-4">
-          <span class="text-gray-600">Welcome, Mentor</span>
+          <span class="text-gray-600" id="mentorEmail">Welcome</span>
           <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
             <i data-feather="user" class="text-indigo-600"></i>
           </div>
+          <button id="logoutBtn" class="px-3 py-1 bg-red-500 text-white rounded">Logout</button>
         </div>
       </div>
     </header>
@@ -87,6 +88,11 @@
       deleteDoc,
       onSnapshot,
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCvv6A_ZnFzxYmqY29klQ2PUTdtaKpu_gg",
@@ -102,6 +108,23 @@
     const db = getFirestore(app);
     const learnersCol = collection(db, "learners");
     const container = document.getElementById("students-list");
+
+    const auth = getAuth(app);
+
+    // 🔐 Protect dashboard
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "auth.html";
+      } else {
+        document.getElementById("mentorEmail").textContent = "Welcome, " + (user.email || "Mentor");
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "auth.html";
+      });
+    });
 
     async function getNextLearnerId() {
       const snap = await getDocs(learnersCol);
@@ -145,7 +168,6 @@
     function renderSnapshot(snapshot) {
       container.innerHTML = "";
       const items = snapshot.docs.map(d => ({ id: d.id, data: d.data() }));
-      // Sort by dropout risk descending (high > medium > low)
       const riskWeight = { high: 3, medium: 2, low: 1 };
       items.sort((a,b) => (riskWeight[b.data.dropoff_risk] || 0) - (riskWeight[a.data.dropoff_risk] || 0));
 
@@ -153,7 +175,7 @@
         const m = item.data || {};
         const risk = (m.dropoff_risk || "low").toLowerCase();
         const completion = Number(m.completion_rate ?? 0);
-        const email = m.email || m.mail || m.emailId || "No email provided";
+        const email = m.email || "No email provided";
 
         const card = document.createElement("div");
         card.className = "bg-white rounded-lg shadow-md p-6 relative";
