@@ -56,6 +56,7 @@
         const s = snap.data();
         document.querySelector("h2").textContent = s.name;
         document.querySelector("p.text-lg").textContent = s.course;
+        document.querySelector("mail").textContent = s.email;
         document.getElementById("overall-progress-text").textContent = s.completion_rate + "%";
         document.getElementById("overall-progress-bar").style.width = s.completion_rate + "%";
 
@@ -107,11 +108,8 @@
                         <div class="flex-1">
                             <h2 class="text-2xl font-bold text-gray-800 mb-1">loading....</h2>
                             <p class="text-lg text-gray-600 mb-2">Web Development Bootcamp</p>
+                            <mail class="lex items-center text-gray-600">example@example.com</mail>
                             <div class="flex flex-wrap gap-4">
-                                <div class="flex items-center text-gray-600">
-                                    <i data-feather="mail" class="w-4 h-4 mr-2"></i>
-                                    <span>alex.johnson@example.com</span>
-                                </div>
                                 <div class="flex items-center text-gray-600">
                                     <i data-feather="phone" class="w-4 h-4 mr-2"></i>
                                     <span>(555) 123-4567</span>
