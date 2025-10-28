@@ -10,8 +10,8 @@ if not firebase_admin._apps:  # _apps is a dict of initialized apps
 db = firestore.client()
 
 # --- 2. Email Setup ---
-SENDER = "anvit.aggarwal@gmail.com"
-PASSWORD = "tuaj dmyu ewhw ozxb"  # create an App Password in Google account settings
+SENDER = "sender@email"
+PASSWORD = "receiver@email"  # create an App Password in Google account settings
 
 def send_email(to, subject, body):
     msg = MIMEText(body)
